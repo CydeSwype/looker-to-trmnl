@@ -31,9 +31,9 @@ This guide explains how to configure Looker to send scheduled reports via email 
 3. **Subject**: Customize the email subject (this will be the report title on TRMNL)
    - Example: "Daily Sales Report"
 4. **Format**: Choose your preferred format:
-   - **CSV** (Recommended for easy parsing)
-   - **PDF** (For visualizations)
-   - **Visualization** (Image format)
+   - **PDF** (Recommended - service parses PDF tables automatically)
+   - **CSV** (Also supported if available)
+   - **Visualization** (Image format - not currently supported)
 
 ## Step 4: Configure Schedule
 
@@ -76,7 +76,19 @@ This guide explains how to configure Looker to send scheduled reports via email 
 
 ## Recommended Configuration for TRMNL
 
-### For CSV Reports (Recommended)
+### For PDF Reports (Recommended)
+
+```
+Format: PDF
+Attach Results: Yes
+Page Size: Letter or A4
+Orientation: Portrait (better for e-ink)
+Subject: [Report Name] - [Date]
+```
+
+**Note**: The service automatically parses PDF tables and extracts data. Ensure your Looker report has clear table formatting for best results.
+
+### For CSV Reports (Alternative)
 
 ```
 Format: CSV
@@ -86,15 +98,7 @@ Limit Rows: 50-100 (adjust based on display size)
 Subject: [Report Name] - [Date]
 ```
 
-### For PDF Reports
-
-```
-Format: PDF
-Attach Results: Yes
-Page Size: Letter or A4
-Orientation: Portrait (better for e-ink)
-Subject: [Report Name] - [Date]
-```
+**Note**: CSV is also supported, but PDF is the default format from Looker.
 
 ## Email Query Configuration
 

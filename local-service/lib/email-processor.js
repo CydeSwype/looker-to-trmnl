@@ -4,6 +4,7 @@
  */
 
 const { createCanvas } = require('canvas');
+const pdfParse = require('pdf-parse');
 const { logger } = require('./logger');
 
 /**
@@ -29,23 +30,43 @@ async function parseEmail(gmail, emailMessage) {
   // Extract body and attachments
   await extractBodyAndAttachments(gmail, emailMessage.id, emailMessage.payload, emailData);
 
-  // Download and parse CSV if found
+  // Download and parse attachments (PDF or CSV)
   if (emailData.attachments.length > 0) {
-    const csvAttachment = emailData.attachments.find(
-      att => att.mimeType === 'text/csv' || att.filename.endsWith('.csv')
+    // Try PDF first (Looker sends PDFs)
+    const pdfAttachment = emailData.attachments.find(
+      att => att.mimeType === 'application/pdf' || att.filename.endsWith('.pdf')
     );
     
-    if (csvAttachment && csvAttachment.attachmentId) {
+    if (pdfAttachment && pdfAttachment.attachmentId) {
       try {
-        const csvContent = await downloadAttachment(gmail, emailMessage.id, csvAttachment.attachmentId);
-        emailData.csvData = parseCSV(csvContent);
+        const pdfBuffer = await downloadAttachmentAsBuffer(gmail, emailMessage.id, pdfAttachment.attachmentId);
+        const pdfText = await parsePDF(pdfBuffer);
+        emailData.csvData = parsePDFTable(pdfText);
+        logger.info('Successfully parsed PDF attachment');
       } catch (error) {
-        logger.warn('Could not download CSV attachment:', error.message);
+        logger.warn('Could not parse PDF attachment:', error.message);
+      }
+    }
+    
+    // Fallback to CSV if no PDF found
+    if (!emailData.csvData) {
+      const csvAttachment = emailData.attachments.find(
+        att => att.mimeType === 'text/csv' || att.filename.endsWith('.csv')
+      );
+      
+      if (csvAttachment && csvAttachment.attachmentId) {
+        try {
+          const csvContent = await downloadAttachment(gmail, emailMessage.id, csvAttachment.attachmentId);
+          emailData.csvData = parseCSV(csvContent);
+          logger.info('Successfully parsed CSV attachment');
+        } catch (error) {
+          logger.warn('Could not download CSV attachment:', error.message);
+        }
       }
     }
   }
 
-  // If no CSV, try parsing from email body
+  // If no attachment data, try parsing from email body
   if (!emailData.csvData && emailData.body) {
     emailData.csvData = parseCSVFromBody(emailData.body);
   }
@@ -89,7 +110,7 @@ async function extractBodyAndAttachments(gmail, messageId, payload, emailData) {
 }
 
 /**
- * Download attachment content
+ * Download attachment content as text
  */
 async function downloadAttachment(gmail, messageId, attachmentId) {
   try {
@@ -100,13 +121,82 @@ async function downloadAttachment(gmail, messageId, attachmentId) {
     });
 
     const content = Buffer.from(response.data.data, 'base64').toString('utf-8');
-    
-    // Store in attachments array for later use
     return content;
   } catch (error) {
     logger.error(`Error downloading attachment ${attachmentId}:`, error);
     throw error;
   }
+}
+
+/**
+ * Download attachment content as buffer (for PDFs)
+ */
+async function downloadAttachmentAsBuffer(gmail, messageId, attachmentId) {
+  try {
+    const response = await gmail.users.messages.attachments.get({
+      userId: 'me',
+      messageId: messageId,
+      id: attachmentId
+    });
+
+    return Buffer.from(response.data.data, 'base64');
+  } catch (error) {
+    logger.error(`Error downloading attachment ${attachmentId}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Parse PDF and extract text
+ */
+async function parsePDF(pdfBuffer) {
+  try {
+    const data = await pdfParse(pdfBuffer);
+    return data.text;
+  } catch (error) {
+    logger.error('Error parsing PDF:', error);
+    throw error;
+  }
+}
+
+/**
+ * Parse PDF text into table-like structure
+ * Looks for tabular data in the PDF text
+ */
+function parsePDFTable(pdfText) {
+  const lines = pdfText.split('\n').filter(line => line.trim());
+  const data = [];
+  
+  // Try to find table structure
+  // Look for lines with multiple values separated by spaces/tabs
+  for (const line of lines) {
+    // Skip empty lines and headers that are too short
+    if (!line.trim() || line.trim().length < 3) continue;
+    
+    // Try splitting by multiple spaces (common in PDF tables)
+    const parts = line.split(/\s{2,}|\t/).filter(part => part.trim());
+    
+    // If we have at least 2 columns, treat as data row
+    if (parts.length >= 2) {
+      data.push(parts);
+    } else {
+      // Try splitting by single space if multiple spaces didn't work
+      const singleSpaceParts = line.split(/\s+/).filter(part => part.trim());
+      if (singleSpaceParts.length >= 2) {
+        data.push(singleSpaceParts);
+      }
+    }
+  }
+  
+  // If we found data, return it
+  if (data.length > 0) {
+    logger.info(`Extracted ${data.length} rows from PDF`);
+    return data;
+  }
+  
+  // Fallback: return null if no table structure found
+  logger.warn('Could not extract table structure from PDF');
+  return null;
 }
 
 /**
@@ -230,5 +320,8 @@ module.exports = {
   parseEmail,
   generatePNG,
   downloadAttachment,
+  downloadAttachmentAsBuffer,
+  parsePDF,
+  parsePDFTable,
   parseCSV
 };
