@@ -24,22 +24,23 @@ Automated pipeline to deliver Looker reports to TRMNL e-ink displays via schedul
 
 ### Setup Steps
 
-1. **Set up Gmail API** (see `scripts/gmail-setup.md`)
-2. **Deploy TRMNL Plugin** (see `trmnl-plugin/README.md`)
-3. **Configure Pipedream Workflow** (see `pipedream-workflow/README.md`)
-4. **Configure Looker** (see `docs/looker-setup.md`)
+1. **Set up Gmail API** (see `scripts/gmail-setup.md`) - ✅ Already done
+2. **Get TRMNL Image Webhook URL** (from your TRMNL account)
+3. **Install and configure local service** (see `SETUP_LOCAL.md`)
+4. **Schedule daily execution** (cron or launchd)
+5. **Configure Looker** (see `docs/looker-setup.md`)
 
 ## Architecture
 
 ```
-Looker → Gmail → Pipedream → TRMNL Plugin → E-ink Display
+Looker → Gmail → Local Script (Mac mini) → TRMNL Image API → E-ink Display
 ```
 
 ## Components
 
-- **TRMNL Plugin**: Receives webhook data and renders content for e-ink display
-- **Pipedream Workflow**: Monitors Gmail, parses emails, transforms data, sends to TRMNL
+- **Local Service**: Runs on Mac mini, processes emails, generates PNG images
 - **Gmail API**: Receives Looker scheduled emails within G Suite infrastructure
+- **TRMNL Image API**: Receives PNG images and displays on e-ink
 
 ## Security
 
@@ -47,8 +48,8 @@ All email processing happens within your G Suite infrastructure. No third-party 
 
 ## Documentation
 
-- [Planning Document](./PLANNING.md) - Full architecture and planning details
-- [TRMNL Plugin Setup](./trmnl-plugin/README.md) - Plugin deployment guide
-- [Pipedream Workflow Setup](./pipedream-workflow/README.md) - Workflow configuration
+- [Setup Guide](./SETUP_LOCAL.md) - Complete local setup instructions
+- [Architecture](./ARCHITECTURE.md) - Architecture overview
+- [Planning Document](./PLANNING.md) - Full planning details
 - [Gmail API Setup](./scripts/gmail-setup.md) - Gmail API configuration guide
 - [Looker Configuration](./docs/looker-setup.md) - Looker scheduled email setup

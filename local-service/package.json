@@ -1,0 +1,28 @@
+{
+  "name": "looker-to-trmnl-local",
+  "version": "1.0.0",
+  "description": "Local service to process Looker emails and send PNG images to TRMNL",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test/test.js"
+  },
+  "keywords": [
+    "looker",
+    "trmnl",
+    "gmail",
+    "local"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "googleapis": "^126.0.1",
+    "axios": "^1.6.2",
+    "canvas": "^2.11.2",
+    "dotenv": "^16.3.1",
+    "form-data": "^4.0.0"
+  }
+}

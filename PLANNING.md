@@ -20,7 +20,7 @@ This document outlines the architecture and implementation plan for a data pipel
 │    Email    │
 └──────┬──────┘
        │
-       │ (Email with report data)
+       │ (Email with CSV attachment)
        ▼
 ┌─────────────┐
 │  Gmail      │
@@ -28,20 +28,21 @@ This document outlines the architecture and implementation plan for a data pipel
 │ (G Suite)   │
 └──────┬──────┘
        │
-       │ (Webhook trigger)
+       │ (Polling via Gmail API)
        ▼
 ┌─────────────┐
-│ Workflow    │
-│ Automation  │
-│ (Pipedream/ │
-│  Zapier)    │
+│ Local Script│
+│  (Mac mini) │
+│  - Parse CSV │
+│  - Generate │
+│    PNG       │
 └──────┬──────┘
        │
-       │ (Transformed data)
+       │ (POST PNG image)
        ▼
 ┌─────────────┐
 │   TRMNL     │
-│   Plugin    │
+│ Image API   │
 │  (Webhook)  │
 └──────┬──────┘
        │
@@ -78,24 +79,25 @@ This document outlines the architecture and implementation plan for a data pipel
   - Trigger workflow when emails arrive (via push notifications or polling)
   - Extract email content and attachments
 
-### 3. Workflow Automation Layer
-- **Options**:
-  - **Pipedream** (Recommended): Low-code workflow automation with built-in integrations
-  - **Zapier**: Similar workflow automation platform
-  - **Custom Service**: Node.js/Python service with email parsing
+### 3. Local Service (Mac mini)
+- **Purpose**: Process emails and generate PNG images
+- **Location**: Runs locally on Mac mini
 - **Responsibilities**:
+  - Poll Gmail API for new emails
   - Parse incoming email content
-  - Extract report data (from attachments or email body)
-  - Transform data into TRMNL webhook format
-  - Send webhook to TRMNL plugin
-
-### 4. TRMNL Plugin
-- **Purpose**: Custom plugin that receives webhook data and renders content
+  - Extract CSV data from attachments
+  - Generate PNG images from data
+  - POST PNG images to TRMNL image webhook
 - **Technology**: 
-  - HTML/CSS for layout
-  - Liquid templating for dynamic content
-  - Webhook endpoint for receiving data
-- **Reference**: [TRMNL Plugin Documentation](https://trmnl.co/docs)
+  - Node.js runtime
+  - Canvas library for PNG generation
+  - Scheduled with cron or launchd
+
+### 4. TRMNL Image API
+- **Purpose**: Receive PNG images and display on e-ink
+- **Method**: POST multipart/form-data with PNG image
+- **Format**: PNG image (configurable dimensions)
+- **Reference**: [TRMNL API Documentation](https://trmnl.co/docs)
 
 ## Data Flow
 
