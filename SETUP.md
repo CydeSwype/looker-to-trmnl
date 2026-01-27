@@ -2,15 +2,33 @@
 
 This is a step-by-step guide to get your Looker to TRMNL pipeline up and running.
 
+## Architecture Options
+
+You have two options for the workflow automation layer:
+
+### Option A: GCP Service (Recommended) ⭐
+- **Cost**: ~$0.40/month (Cloud Run)
+- **Control**: Full control over code and execution
+- **Setup**: See [SETUP_GCP_SERVICE.md](./SETUP_GCP_SERVICE.md)
+- **Best for**: Cost-conscious, existing GCP resources, long-term maintenance
+
+### Option B: Pipedream
+- **Cost**: Free tier limited, then $19/month+
+- **Control**: Less control, vendor lock-in
+- **Setup**: See [pipedream-workflow/README.md](./pipedream-workflow/README.md)
+- **Best for**: Quick setup, no infrastructure management
+
+**Recommendation**: Use GCP Service for better cost and control.
+
 ## Overview
 
 The setup process involves:
 1. Setting up Gmail API access
 2. Creating and deploying the TRMNL plugin
-3. Configuring the Pipedream workflow
+3. **Choose one**: Deploying GCP service OR configuring Pipedream workflow
 4. Configuring Looker scheduled emails
 
-**Estimated Time**: 30-60 minutes
+**Estimated Time**: 45-60 minutes (GCP Service) or 30-45 minutes (Pipedream)
 
 ## Prerequisites Checklist
 
@@ -48,7 +66,16 @@ The setup process involves:
 **Key Outputs:**
 - TRMNL plugin webhook URL
 
-### Step 3: Pipedream Workflow Setup (15 minutes)
+### Step 3: Workflow Automation Setup
+
+**Choose one option:**
+
+#### Option A: GCP Service (Recommended) - See [SETUP_GCP_SERVICE.md](./SETUP_GCP_SERVICE.md)
+- Deploy Node.js service to Cloud Run
+- Set up Cloud Scheduler for daily execution
+- Full control, lower cost
+
+#### Option B: Pipedream Workflow (15 minutes)
 
 1. Log into [Pipedream](https://pipedream.com)
 2. Click "New Workflow" → "Start from scratch"
