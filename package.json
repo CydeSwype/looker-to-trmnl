@@ -1,0 +1,21 @@
+{
+  "name": "looker-to-trmnl-pipeline",
+  "version": "1.0.0",
+  "description": "Automated pipeline to deliver Looker reports to TRMNL e-ink displays",
+  "main": "scripts/parse-csv.js",
+  "scripts": {
+    "test-parse": "node scripts/parse-csv.js"
+  },
+  "keywords": [
+    "looker",
+    "trmnl",
+    "e-ink",
+    "data-pipeline",
+    "automation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
