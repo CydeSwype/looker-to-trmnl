@@ -2,7 +2,7 @@
 /**
  * Local Service: Looker to TRMNL Pipeline
  * 
- * Runs on Mac mini to:
+ * Runs locally to:
  * 1. Poll Gmail API for new Looker report emails
  * 2. Parse email content and CSV attachments
  * 3. Generate PNG image from data
@@ -23,9 +23,9 @@ const { logger } = require('./lib/logger');
 // Configuration from environment variables
 const config = {
   gmail: {
-    credentialsPath: process.env.GMAIL_CREDENTIALS_PATH || path.join(__dirname, '../example-project-for-ian-e67ca0405681.json'),
-    userEmail: process.env.GMAIL_USER_EMAIL || 'looker-reports@yourdomain.com',
-    query: process.env.GMAIL_QUERY || 'from:looker@yourdomain.com',
+    credentialsPath: process.env.GMAIL_CREDENTIALS_PATH,
+    userEmail: process.env.GMAIL_USER_EMAIL || 'you@example.com',
+    query: process.env.GMAIL_QUERY || 'from:looker-studio-noreply@google.com',
     label: process.env.GMAIL_LABEL || 'INBOX',
   },
   trmnl: {
@@ -45,6 +45,10 @@ const config = {
 async function processEmails() {
   if (!config.trmnl.imageWebhookUrl) {
     throw new Error('TRMNL_IMAGE_WEBHOOK_URL environment variable not set');
+  }
+
+  if (!config.gmail.credentialsPath) {
+    throw new Error('GMAIL_CREDENTIALS_PATH environment variable not set (set it in .env)');
   }
 
   if (!fs.existsSync(config.gmail.credentialsPath)) {

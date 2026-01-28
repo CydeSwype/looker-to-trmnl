@@ -8,27 +8,27 @@ This document outlines the initial setup steps for the Looker → TRMNL pipeline
 - [ ] Create TRMNL account at [trmnl.co](https://trmnl.co)
 - [ ] Set up your e-ink display device
 - [ ] Note your TRMNL account details
-- [ ] **Action Required**: Once you have your TRMNL account, I'll help you deploy the plugin
+- [ ] Once the plugin is created, copy its webhook URL into your local service `.env`
 
 ### 1.2 Google Cloud / Gmail API Setup
-- [ ] Access Google Cloud Console (requires project access)
+- [ ] Access [Google Cloud Console](https://console.cloud.google.com) (requires project access)
 - [ ] Create a new Google Cloud project (or use existing)
 - [ ] Enable Gmail API in the project
 - [ ] Create OAuth2 credentials (for user inbox) or Service Account
   - **Option A**: OAuth2 Client ID (recommended for reading a user's Gmail)
   - **Option B**: Service Account (for domain-wide delegation, requires admin)
-- [ ] **Action Required**: Share the credentials with me (securely) so I can help configure the local service (or GCP service)
-- [ ] **Reference**: See `scripts/gmail-setup.md` for detailed steps
+- [ ] Save the credentials JSON locally; you'll set `GMAIL_CREDENTIALS_PATH` in `local-service/.env`
+- [ ] See `scripts/gmail-setup.md` for detailed steps
 
 ### 1.3 Gmail / Email Address
-- [ ] Use the Gmail address that will receive Looker reports (e.g. your inbox or a dedicated address)
+- [ ] Decide which Gmail address will receive Looker reports (e.g. your inbox or a dedicated address)
 - [ ] Set up Gmail filters (optional but recommended) to label Looker emails
-- [ ] **Action Required**: Share the email address so I can update configuration files
+- [ ] Use this address as `GMAIL_USER_EMAIL` in `.env` and as the Looker schedule recipient
 
 ### 1.4 Looker Access
-- [ ] Verify you have admin access or permission to create scheduled deliveries
+- [ ] Verify you have access to create scheduled deliveries
 - [ ] Identify the Look or Dashboard you want to schedule
-- [ ] **Action Required**: Share the report details so I can help configure the schedule
+- [ ] Follow `docs/looker-setup.md` to configure the schedule
 
 ## Phase 2: Code Review & Preparation (🤖 I Can Help)
 
@@ -39,11 +39,10 @@ This document outlines the initial setup steps for the Looker → TRMNL pipeline
 - [x] ✅ Documentation files
 
 ### 2.2 Configuration Files to Update
-Once you provide the information above, I'll help update:
-- [ ] Local service `.env` (or GCP env vars) with Gmail credentials and TRMNL webhook URL
-- [ ] TRMNL Private Plugin markup (after you create the plugin)
-- [ ] Email query filters (e.g. `from:looker-studio-noreply@google.com`)
-- [ ] Looker configuration guide with your specific details
+- [ ] Edit `local-service/.env` (or GCP env vars) with your Gmail credentials path and TRMNL webhook URL
+- [ ] Paste the TRMNL Private Plugin markup from `local-service/trmnl-plugin-template.html` (or `trmnl-plugin/plugin.html`) into your plugin
+- [ ] Set the Gmail query in `.env` (e.g. `from:looker-studio-noreply@google.com` for Looker Studio)
+- [ ] Configure Looker per `docs/looker-setup.md`
 
 ### 2.3 Testing Preparation
 - [ ] Create sample CSV file for testing (if you have one)
@@ -57,7 +56,7 @@ Once you provide the information above, I'll help update:
 - [ ] Create new Private Plugin (webhook strategy)
 - [ ] Copy `local-service/trmnl-plugin-template.html` (or `trmnl-plugin/plugin.html`) into TRMNL editor
 - [ ] Save plugin and copy webhook URL
-- [ ] **Action Required**: Share webhook URL so I can update the local service (or GCP) config
+- [ ] Add the webhook URL to `local-service/.env` as `TRMNL_IMAGE_WEBHOOK_URL` (or the appropriate TRMNL env var)
 
 ### 3.2 Local Service (or GCP) Deployment
 - [ ] Install dependencies in `local-service/` and configure `.env` (see `SETUP_LOCAL.md`)
@@ -73,45 +72,19 @@ Once you provide the information above, I'll help update:
 - [ ] Set schedule frequency
 - [ ] Send test email
 
-## Information I Need From You
+## Checklist Before Running
 
-To proceed with the setup, please provide:
-
-1. **TRMNL Account Status**
-   - [ ] Account created? (Yes/No)
-   - [ ] Webhook URL (if plugin already created)
-
-2. **Gmail API Credentials**
-   - [ ] Google Cloud project created? (Yes/No)
-   - [ ] Gmail API enabled? (Yes/No)
-   - [ ] OAuth2 Client ID & Secret OR Service Account JSON
-   - [ ] Preferred authentication method (OAuth2 vs Service Account)
-
-3. **Email Configuration**
-   - [ ] Target email address for Looker reports
-   - [ ] Looker sender email address (e.g. `looker-studio-noreply@google.com` for filtering)
-
-4. **Looker Report Details**
-   - [ ] Report name/ID
-   - [ ] Preferred format (PDF/CSV)
-   - [ ] Desired schedule frequency
-
-## Next Steps
-
-Once you've completed the account setup steps (Phase 1), share the information above and I'll:
-
-1. **Update configuration files** with your specific details
-2. **Prepare deployment instructions** tailored to your setup
-3. **Help test the pipeline** step by step
-4. **Troubleshoot any issues** that arise
+- [ ] TRMNL account created and Private Plugin (or Image webhook) set up; webhook URL copied
+- [ ] Google Cloud project created, Gmail API enabled, credentials JSON saved
+- [ ] `local-service/.env` filled in: `GMAIL_CREDENTIALS_PATH`, `GMAIL_USER_EMAIL`, `GMAIL_QUERY`, `TRMNL_IMAGE_WEBHOOK_URL`
+- [ ] Looker report scheduled to email the same address as `GMAIL_USER_EMAIL`
+- [ ] Run `node index.js` from `local-service/` to test; then set up cron or launchd for daily runs
 
 ## Security Notes
 
-⚠️ **Important**: When sharing credentials:
-- Never commit credentials to git
-- Share OAuth2 Client ID/Secret or Service Account JSON securely
-- Use secure channels (not in plain text in chat if possible)
-- Credentials are stored in `.env` (local) or platform config (GCP) and never committed
+- Never commit credentials or `.env` to git (they are in `.gitignore`)
+- Keep OAuth2 client secret or service account JSON only on your machine or in your deployment config
+- The local service stores tokens (e.g. `gmail-token.json`) locally; add them to `.gitignore` if you create new token files
 
 ## Questions to Resolve
 

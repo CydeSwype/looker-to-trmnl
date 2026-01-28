@@ -24,11 +24,12 @@ Simple, local service that processes Looker report emails and sends PNG images d
        │ (Polling via Gmail API)
        ▼
 ┌─────────────┐
-│ Local Script │
-│  (Mac mini)  │
-│  - Parse CSV │
-│  - Generate │
-│    PNG       │
+│ Local       │
+│ Service     │
+│ - Parse     │
+│   PDF/CSV   │
+│ - Generate  │
+│   PNG/JSON  │
 └──────┬──────┘
        │
        │ (POST PNG image)
@@ -53,7 +54,7 @@ Simple, local service that processes Looker report emails and sends PNG images d
 - **Purpose**: Automatically send reports via email on a schedule
 - **Format**: CSV attachment (recommended)
 - **Frequency**: Daily (configurable)
-- **Target**: G Suite email address
+- **Target**: Gmail address (your inbox or a dedicated address)
 
 ### 2. Gmail API
 - **Purpose**: Receive and access Looker report emails
@@ -61,8 +62,8 @@ Simple, local service that processes Looker report emails and sends PNG images d
 - **Access**: Read emails, download attachments
 - **Security**: All processing within G Suite infrastructure
 
-### 3. Local Service (Mac mini)
-- **Location**: Runs locally on Mac mini
+### 3. Local Service
+- **Location**: Runs on your machine (e.g. Mac, Linux, always-on PC)
 - **Function**:
   - Polls Gmail API for new emails
   - Parses CSV attachments

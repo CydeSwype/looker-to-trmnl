@@ -1,21 +1,20 @@
 # Local Service: Looker to TRMNL Pipeline
 
-This service runs locally on your Mac mini to process Looker report emails and send PNG images directly to TRMNL.
+This service runs on your machine to process Looker (or Looker Studio) report emails and send data or images to TRMNL.
 
 ## Architecture
 
 ```
-Looker → Gmail → Local Script (Mac mini) → TRMNL Image API → E-ink Display
+Looker (scheduled email) → Gmail → Local service → TRMNL webhook / Image API → E-ink display
 ```
 
 ## Features
 
-- ✅ Polls Gmail API for Looker report emails
-- ✅ Parses CSV attachments from emails
-- ✅ Generates PNG images from data
-- ✅ POSTs PNG directly to TRMNL image webhook
-- ✅ Runs locally (no cloud services needed)
-- ✅ Can be scheduled with cron or launchd
+- Polls Gmail API for report emails (configurable query)
+- Parses PDF or CSV attachments and extracts table data
+- Can send JSON to a TRMNL Private Plugin webhook or PNG to an Image webhook
+- Runs locally (no third-party workflow service)
+- Can be scheduled with cron or launchd (macOS)
 
 ## Setup
 
@@ -26,10 +25,11 @@ cd local-service
 npm install
 ```
 
-**Note**: The `canvas` package requires native dependencies. On macOS, you may need:
+On macOS, if `canvas` fails to install:
 
 ```bash
 brew install pkg-config cairo pango libpng jpeg giflib librsvg
+npm install
 ```
 
 ### 2. Configure Environment
@@ -41,15 +41,15 @@ cp .env.example .env
 Edit `.env` with your values:
 
 ```bash
-# Path to your service account JSON file
-GMAIL_CREDENTIALS_PATH=../example-project-for-ian-e67ca0405681.json
+# Path to Gmail credentials (OAuth2 client secret JSON or service account JSON)
+GMAIL_CREDENTIALS_PATH=path/to/your-credentials.json
 
-# Gmail settings
-GMAIL_USER_EMAIL=looker-reports@yourdomain.com
-GMAIL_QUERY=from:looker@yourdomain.com
+# Gmail address that receives Looker reports, and search query
+GMAIL_USER_EMAIL=you@example.com
+GMAIL_QUERY=from:looker-studio-noreply@google.com
 
-# TRMNL image webhook URL
-TRMNL_IMAGE_WEBHOOK_URL=https://api.trmnl.co/webhooks/images/your-webhook-id
+# TRMNL webhook URL (from your TRMNL Private Plugin or Image webhook)
+TRMNL_IMAGE_WEBHOOK_URL=https://usetrmnl.com/api/plugin_settings/YOUR_ID/image
 ```
 
 ### 3. Test Run
@@ -119,7 +119,7 @@ launchctl load ~/Library/LaunchAgents/com.looker.trmnl.plist
 
 - `GMAIL_CREDENTIALS_PATH`: Path to service account JSON file
 - `GMAIL_USER_EMAIL`: Email address to check
-- `GMAIL_QUERY`: Gmail search query (e.g., `from:looker@yourdomain.com`)
+- `GMAIL_QUERY`: Gmail search query (e.g. `from:looker-studio-noreply@google.com` for Looker Studio)
 - `TRMNL_IMAGE_WEBHOOK_URL`: TRMNL image webhook URL
 - `TRMNL_API_KEY`: Optional API key
 - `MAX_EMAILS_PER_RUN`: Max emails to process (default: 10)

@@ -24,8 +24,8 @@ const config = {
   gmail: {
     // Service account JSON or OAuth2 credentials
     credentials: process.env.GMAIL_CREDENTIALS ? JSON.parse(process.env.GMAIL_CREDENTIALS) : null,
-    userEmail: process.env.GMAIL_USER_EMAIL || 'looker-reports@yourdomain.com',
-    query: process.env.GMAIL_QUERY || 'from:looker@yourdomain.com',
+    userEmail: process.env.GMAIL_USER_EMAIL || 'you@example.com',
+    query: process.env.GMAIL_QUERY || 'from:looker-studio-noreply@google.com',
     label: process.env.GMAIL_LABEL || 'INBOX',
   },
   trmnl: {

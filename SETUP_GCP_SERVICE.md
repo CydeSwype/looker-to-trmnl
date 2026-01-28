@@ -255,7 +255,7 @@ If using OAuth2:
 2. Click **Schedule** button
 3. Configure:
    - **Delivery Method**: Email
-   - **Recipients**: `looker-reports@yourdomain.com` (from Step 1.5)
+   - **Recipients**: The Gmail address you set as `GMAIL_USER_EMAIL` in your deployment env vars
    - **Subject**: "Daily Sales Report" (or your title)
    - **Format**: **CSV** (recommended for easy parsing)
    - **Attach Results**: Yes
@@ -314,7 +314,7 @@ After completing all steps:
 - Check Cloud Run logs: `gcloud run services logs read looker-to-trmnl --region us-central1`
 
 ### Emails not found
-- Verify Gmail query matches your Looker sender: `from:looker@yourdomain.com`
+- Verify Gmail query matches your Looker sender (e.g. `from:looker-studio-noreply@google.com` for Looker Studio)
 - Check emails are in INBOX or specified label
 - Ensure service account has Gmail API access
 - Test Gmail API access manually

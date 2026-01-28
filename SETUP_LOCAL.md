@@ -1,24 +1,23 @@
-# Setup Guide: Local Service (Mac mini)
+# Setup Guide: Local Service
 
-This guide walks you through setting up the Looker → TRMNL pipeline to run locally on your Mac mini.
+This guide walks you through setting up the Looker → TRMNL pipeline to run locally on your machine (e.g. a Mac, Linux server, or always-on PC).
 
 ## Overview
 
-We'll set up:
-1. **Gmail API** - Service account credentials (already done ✅)
-2. **TRMNL Image Webhook** - Get your image webhook URL
-3. **Local Service** - Install and configure the script
-4. **Scheduling** - Set up daily execution with cron or launchd
-5. **Looker** - Configure scheduled email delivery
+1. **Gmail API** – OAuth2 or service account credentials so the service can read report emails
+2. **TRMNL** – Private Plugin webhook URL or Image webhook URL
+3. **Local Service** – Install dependencies and configure `.env`
+4. **Scheduling** – Run on a schedule (cron or launchd on macOS)
+5. **Looker** – Configure scheduled email to the Gmail address the service reads
 
-**Estimated Time**: 20-30 minutes
+**Estimated time**: 30–45 minutes
 
 ## Prerequisites
 
-- ✅ Gmail API service account JSON file (`example-project-for-ian-e67ca0405681.json`)
-- [ ] Node.js 18+ installed on Mac mini
-- [ ] TRMNL account with image webhook URL
-- [ ] Looker access for scheduled emails
+- Node.js 18+ installed
+- Gmail API credentials (OAuth2 client or service account JSON) – see [scripts/gmail-setup.md](scripts/gmail-setup.md)
+- TRMNL account and webhook URL (Private Plugin or Image webhook)
+- Looker or Looker Studio access to schedule report emails
 
 ## Step 1: Install Node.js (if needed)
 
@@ -61,15 +60,16 @@ Or download from [nodejs.org](https://nodejs.org/)
 
 2. Edit `.env` with your values:
    ```bash
-   # Path to service account JSON (relative to local-service directory)
-   GMAIL_CREDENTIALS_PATH=../example-project-for-ian-e67ca0405681.json
+   # Path to Gmail credentials: OAuth2 client secret JSON or service account JSON
+   # Example: GMAIL_CREDENTIALS_PATH=./credentials.json
+   GMAIL_CREDENTIALS_PATH=path/to/your-gmail-credentials.json
    
-   # Gmail settings
-   GMAIL_USER_EMAIL=looker-reports@yourdomain.com
-   GMAIL_QUERY=from:looker@yourdomain.com
+   # Gmail: address that receives Looker reports, and search query
+   GMAIL_USER_EMAIL=you@example.com
+   GMAIL_QUERY=from:looker-studio-noreply@google.com
    
-   # TRMNL image webhook URL (get from TRMNL account)
-   TRMNL_IMAGE_WEBHOOK_URL=https://api.trmnl.co/webhooks/images/your-webhook-id
+   # TRMNL: Image webhook URL (from TRMNL account)
+   TRMNL_IMAGE_WEBHOOK_URL=https://usetrmnl.com/api/plugin_settings/YOUR_ID/image
    
    # Optional: API key if TRMNL requires it
    # TRMNL_API_KEY=your-api-key
@@ -97,14 +97,7 @@ Or download from [nodejs.org](https://nodejs.org/)
    node index.js
    ```
 
-3. Check the output - you should see:
-   ```
-   [INFO] Searching for emails with query: from:looker@yourdomain.com
-   [INFO] Found 1 email(s)
-   [INFO] Successfully processed email: Daily Sales Report
-   [INFO] Sent image to TRMNL: 200
-   [INFO] Processing complete: { processed: 1, failed: 0, ... }
-   ```
+3. Check the output – you should see log lines for the Gmail query, emails found, and TRMNL response (e.g. 200).
 
 4. Verify the image appears on your TRMNL display
 
@@ -194,7 +187,7 @@ Or download from [nodejs.org](https://nodejs.org/)
 1. Navigate to your Looker report
 2. Click **Schedule**
 3. Configure:
-   - **Recipients**: `looker-reports@yourdomain.com` (from Step 3)
+   - **Recipients**: The Gmail address you configured in `.env` as `GMAIL_USER_EMAIL`
    - **Format**: **CSV** (recommended)
    - **Attach Results**: Yes
    - **Frequency**: Daily
@@ -263,9 +256,10 @@ npm install
 ```
 
 ### Gmail API errors
-- Verify service account JSON file path in `.env`
-- Check file exists: `ls -la ../example-project-for-ian-e67ca0405681.json`
-- Verify service account has Gmail API access enabled
+- Verify the credentials file path in `.env` (`GMAIL_CREDENTIALS_PATH`)
+- Ensure the file exists and is valid JSON (OAuth2 client secret or service account)
+- If using OAuth2, run the service once to complete the browser flow and save the token
+- Verify Gmail API is enabled in your Google Cloud project
 
 ### No emails found
 - Verify Gmail query matches your Looker sender

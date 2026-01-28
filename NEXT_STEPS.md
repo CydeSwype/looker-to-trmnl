@@ -60,40 +60,13 @@ Based on your requirements:
    - Set daily schedule
    - **Guide**: `docs/looker-setup.md`
 
-## Information I Need From You
+## Checklist Before Deploying
 
-To proceed, please provide:
-
-### 1. Gmail API Credentials
-- [ ] Google Cloud project created? (Yes/No)
-- [ ] Gmail API enabled? (Yes/No)
-- [ ] Service Account JSON file OR OAuth2 Client ID/Secret
-- [ ] Target email address for Looker reports
-- [ ] Looker sender email address (for filtering)
-
-### 2. TRMNL Details
-- [ ] TRMNL account created? (Yes/No)
-- [ ] Plugin created? (Yes/No)
-- [ ] Webhook URL (if plugin created)
-
-### 3. GCP Project Details
-- [ ] GCP project ID
-- [ ] Preferred region (e.g., us-central1)
-- [ ] Preferred deployment time (for Cloud Scheduler)
-
-### 4. Looker Report Details
-- [ ] Report name/ID
-- [ ] Preferred schedule time (e.g., 8 AM Pacific)
-
-## What I'll Do Next
-
-Once you provide the information above, I'll:
-
-1. **Update configuration files** with your specific values
-2. **Prepare deployment commands** tailored to your setup
-3. **Help test the pipeline** step by step
-4. **Troubleshoot any issues** that arise
-5. **Optimize for your specific report format**
+- [ ] Google Cloud project created, Gmail API enabled
+- [ ] Gmail credentials (Service Account JSON or OAuth2) saved
+- [ ] TRMNL account created, Private Plugin (or Image webhook) set up, webhook URL copied
+- [ ] GCP project ID and preferred region (e.g. us-central1) chosen
+- [ ] Looker report scheduled to email the address you will use for `GMAIL_USER_EMAIL`
 
 ## Quick Start Commands
 
@@ -144,4 +117,4 @@ If you have questions about:
 
 ---
 
-**Ready to start?** Begin with Gmail API setup, then share the information above and I'll help with the rest!
+**Ready to start?** Begin with [scripts/gmail-setup.md](scripts/gmail-setup.md), then follow [SETUP_GCP_SERVICE.md](SETUP_GCP_SERVICE.md) or [SETUP_LOCAL.md](SETUP_LOCAL.md).
