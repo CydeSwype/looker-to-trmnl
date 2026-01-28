@@ -23,12 +23,6 @@ looker-to-trmnl/
 │   ├── README.md                # Plugin setup instructions
 │   └── plugin.html              # TRMNL plugin HTML/CSS/Liquid template
 │
-├── pipedream-workflow/          # Legacy (unused); kept for reference
-│   ├── README.md                # Legacy workflow notes
-│   ├── parse-email.js           # (unused)
-│   ├── transform-data.js        # (unused)
-│   └── workflow-config.json     # (unused)
-│
 ├── scripts/                     # Utility scripts and setup guides
 │   ├── gmail-setup.md           # Gmail API setup guide
 │   └── parse-csv.js             # CSV parsing utility (for testing)
@@ -62,10 +56,6 @@ The local service orchestrates the pipeline: it reads Gmail (via Gmail API), par
 - **lib/email-processor.js**: PDF parsing, table extraction, webhook payload formatting
 - **trmnl-plugin-template.html**: TRMNL Framework markup (Grid layout) for the Private Plugin
 
-### Legacy: Pipedream Workflow (`pipedream-workflow/`)
-
-**Not used.** This folder is kept for reference only. The current design uses the local service (or GCP service) instead.
-
 ### Scripts (`scripts/`)
 
 Utility scripts and setup guides.
@@ -90,7 +80,6 @@ Additional setup and configuration guides.
 
 - **plugin.html**: TRMNL plugin template (copy into TRMNL editor)
 - **local-service/**: Run `node index.js` (see local-service/README.md)
-- **parse-email.js**, **transform-data.js**: Legacy Pipedream steps (unused)
 - **parse-csv.js**: Utility script for local testing
 
 ### Documentation Files

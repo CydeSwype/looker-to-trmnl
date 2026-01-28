@@ -91,7 +91,7 @@ Simple, local service that processes Looker report emails and sends PNG images d
 
 ## Advantages
 
-✅ **Simple**: No cloud services, no Pipedream
+✅ **Simple**: No third-party workflow or cloud services required
 ✅ **Cost-effective**: Free (runs locally)
 ✅ **Control**: Full control over code and execution
 ✅ **Privacy**: All processing happens locally

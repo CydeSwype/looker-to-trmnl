@@ -6,7 +6,6 @@ This guide is for contributors working on the Looker → Gmail → Local Service
 
 - `local-service/`: Node.js service that reads Gmail, parses PDFs, and POSTs to TRMNL webhook.
 - `trmnl-plugin/`: TRMNL Private Plugin template (HTML/CSS/Liquid).
-- `pipedream-workflow/`: Legacy (unused); kept for reference only.
 - `scripts/`: Utilities and setup helpers (notably `parse-csv.js` for local parsing tests).
 - `docs/`: Looker configuration docs; see `docs/looker-setup.md`.
 - Root docs: `README.md`, `SETUP.md`, `PLANNING.md`, `PROJECT_STRUCTURE.md`.
