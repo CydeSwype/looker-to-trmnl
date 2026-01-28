@@ -9,7 +9,7 @@ Automated pipeline to deliver Looker (or Looker Studio) reports to TRMNL e-ink d
 3. **Local service** (or optional GCP service) parses reports and formats data for TRMNL.
 4. **TRMNL** receives the payload via a Private Plugin webhook or Image API and shows it on your e-ink display.
 
-No Pipedream or other third-party workflow service is required.
+No third-party workflow service is required.
 
 ## Project Structure
 
@@ -19,7 +19,6 @@ No Pipedream or other third-party workflow service is required.
 ├── trmnl-plugin/          # TRMNL Private Plugin HTML/Liquid template
 ├── scripts/               # Setup and utility scripts
 ├── docs/                  # Documentation
-├── pipedream-workflow/    # Legacy (unused); kept for reference
 └── gcp-service/           # Optional: same pipeline deployed to Cloud Run
 ```
 
