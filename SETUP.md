@@ -6,35 +6,34 @@ This is a step-by-step guide to get your Looker to TRMNL pipeline up and running
 
 You have two options for the workflow automation layer:
 
-### Option A: GCP Service (Recommended) ⭐
+### Option A: Local Service (Recommended) ⭐
+- **Cost**: Free (runs on your machine, e.g. Mac mini)
+- **Control**: Full control over code and execution
+- **Setup**: See [SETUP_LOCAL.md](./SETUP_LOCAL.md)
+- **Best for**: Simple setup, no cloud spend, single machine always on
+
+### Option B: GCP Service
 - **Cost**: ~$0.40/month (Cloud Run)
 - **Control**: Full control over code and execution
 - **Setup**: See [SETUP_GCP_SERVICE.md](./SETUP_GCP_SERVICE.md)
-- **Best for**: Cost-conscious, existing GCP resources, long-term maintenance
+- **Best for**: Serverless, no local machine required
 
-### Option B: Pipedream
-- **Cost**: Free tier limited, then $19/month+
-- **Control**: Less control, vendor lock-in
-- **Setup**: See [pipedream-workflow/README.md](./pipedream-workflow/README.md)
-- **Best for**: Quick setup, no infrastructure management
-
-**Recommendation**: Use GCP Service for better cost and control.
+**Recommendation**: Use the local service for simplicity and zero cost.
 
 ## Overview
 
 The setup process involves:
 1. Setting up Gmail API access
-2. Creating and deploying the TRMNL plugin
-3. **Choose one**: Deploying GCP service OR configuring Pipedream workflow
+2. Creating and configuring the TRMNL Private Plugin
+3. **Choose one**: Running the local service OR deploying the GCP service
 4. Configuring Looker scheduled emails
 
-**Estimated Time**: 45-60 minutes (GCP Service) or 30-45 minutes (Pipedream)
+**Estimated Time**: 45–60 minutes (local service) or 60–90 minutes (GCP)
 
 ## Prerequisites Checklist
 
 - [ ] TRMNL account created
-- [ ] G Suite/Google Workspace admin access
-- [ ] Pipedream account (free tier works)
+- [ ] Gmail / Google account (OAuth2 or service account for Gmail API)
 - [ ] Looker admin access
 - [ ] A Looker report you want to display
 
@@ -45,8 +44,8 @@ The setup process involves:
 1. Follow the detailed guide: [`scripts/gmail-setup.md`](./scripts/gmail-setup.md)
 2. Create a Google Cloud project
 3. Enable Gmail API
-4. Create OAuth2 credentials or service account
-5. Create a dedicated email address (e.g., `looker-reports@yourdomain.com`)
+4. Create OAuth2 credentials (recommended for user inbox) or a service account
+5. Use the email address that receives Looker reports (e.g. `you@yourdomain.com`)
 6. Set up Gmail filters (optional but recommended)
 
 **Key Outputs:**
@@ -57,84 +56,28 @@ The setup process involves:
 
 1. Log into your TRMNL account
 2. Navigate to Plugins → Create New Plugin
-3. Choose "Private Plugin"
-4. Copy the entire contents of [`trmnl-plugin/plugin.html`](./trmnl-plugin/plugin.html)
-5. Paste into the TRMNL plugin editor
-6. Save the plugin
-7. **Important**: Copy your plugin's webhook URL (you'll need this for Pipedream)
+3. Choose "Private Plugin" and webhook strategy
+4. Copy the template from `local-service/trmnl-plugin-template.html` (or `trmnl-plugin/plugin.html`) into the TRMNL plugin editor
+5. Save the plugin
+6. **Important**: Copy your plugin's webhook URL (you'll need this for the local service or GCP service)
 
 **Key Outputs:**
-- TRMNL plugin webhook URL
+- TRMNL Private Plugin webhook URL
 
 ### Step 3: Workflow Automation Setup
 
 **Choose one option:**
 
-#### Option A: GCP Service (Recommended) - See [SETUP_GCP_SERVICE.md](./SETUP_GCP_SERVICE.md)
+#### Option A: Local Service (Recommended) – See [SETUP_LOCAL.md](./SETUP_LOCAL.md)
+- Install dependencies in `local-service/`
+- Configure `.env` with Gmail credentials and TRMNL webhook URL
+- Run `node index.js` (or schedule with cron/launchd)
+- Full control, zero cloud cost
+
+#### Option B: GCP Service – See [SETUP_GCP_SERVICE.md](./SETUP_GCP_SERVICE.md)
 - Deploy Node.js service to Cloud Run
 - Set up Cloud Scheduler for daily execution
-- Full control, lower cost
-
-#### Option B: Pipedream Workflow (15 minutes)
-
-1. Log into [Pipedream](https://pipedream.com)
-2. Click "New Workflow" → "Start from scratch"
-
-#### 3a. Add Gmail Trigger
-
-1. Click "+" to add a step
-2. Search for "Gmail" → Select "Gmail - New Email"
-3. Click "Connect Account"
-4. Choose authentication method:
-   - **OAuth2**: Enter Client ID and Secret from Step 1
-   - **Service Account**: Upload the JSON key file
-5. Configure trigger:
-   - **Label**: "INBOX" or "Looker Reports"
-   - **Query**: `from:looker@yourdomain.com` (adjust to your Looker sender)
-   - **Polling Interval**: 5 minutes (or enable Push Notifications)
-
-#### 3b. Add Email Parsing Step
-
-1. Add new step: "Code" → "Run Node.js code"
-2. Name it "Parse Email"
-3. Copy code from [`pipedream-workflow/parse-email.js`](./pipedream-workflow/parse-email.js)
-4. Paste into the code editor
-5. Save
-
-#### 3c. Add Data Transformation Step
-
-1. Add another "Code" step
-2. Name it "Transform Data"
-3. Copy code from [`pipedream-workflow/transform-data.js`](./pipedream-workflow/transform-data.js)
-4. Paste into the code editor
-5. Save
-
-#### 3d. Add TRMNL Webhook Step
-
-1. Add new step: "HTTP" → "Make HTTP Request"
-2. Configure:
-   - **Method**: POST
-   - **URL**: Your TRMNL plugin webhook URL from Step 2
-   - **Headers**:
-     ```
-     Content-Type: application/json
-     ```
-   - **Body**: 
-     ```json
-     {{steps.transform_data.$return_value}}
-     ```
-3. Save
-
-#### 3e. Test the Workflow
-
-1. Click "Test" or "Send Test Event"
-2. Or send a test email from Looker
-3. Check execution logs to verify each step works
-4. Verify data appears on your TRMNL display
-
-**Key Outputs:**
-- Working Pipedream workflow
-- Verified TRMNL webhook connection
+- Full control, low monthly cost
 
 ### Step 4: Configure Looker (10 minutes)
 
@@ -142,12 +85,12 @@ The setup process involves:
 2. Navigate to your Looker report
 3. Click "Schedule"
 4. Configure:
-   - **Recipients**: Your G Suite email address from Step 1
-   - **Format**: CSV (recommended) or PDF
+   - **Recipients**: Your Gmail address from Step 1
+   - **Format**: PDF (recommended; service parses PDF tables)
    - **Frequency**: Daily, weekly, etc.
    - **Subject**: Descriptive title (will appear on TRMNL)
 5. Send a test email
-6. Verify it triggers your Pipedream workflow
+6. Verify it is processed by your local service or GCP service
 
 **Key Outputs:**
 - Active Looker schedule
@@ -158,56 +101,55 @@ The setup process involves:
 After completing all steps, verify:
 
 - [ ] Test email from Looker arrives in Gmail
-- [ ] Pipedream workflow detects the email
-- [ ] Email parsing step extracts data correctly
-- [ ] Data transformation creates valid TRMNL payload
+- [ ] Local service (or GCP service) processes the email
+- [ ] PDF is parsed and data is extracted
+- [ ] TRMNL webhook receives the payload
 - [ ] TRMNL display updates with report data
 - [ ] Scheduled Looker emails trigger the pipeline automatically
 
 ## Troubleshooting
 
-### Email Not Detected by Pipedream
+### Email Not Detected
 
-- Check Gmail query matches your Looker sender address
-- Verify emails are in the specified label/folder
-- Check Pipedream execution logs for errors
-- Increase polling interval if using polling
+- Check Gmail query matches your Looker sender address (e.g. `from:looker-studio-noreply@google.com`)
+- Verify emails are in the inbox (or label) the service is querying
+- Check service logs for errors
+- For local service: ensure OAuth2 token is valid (`gmail-token.json`)
 
 ### Data Not Appearing on TRMNL
 
-- Verify TRMNL webhook URL is correct
-- Check Pipedream HTTP request step for errors
-- Verify TRMNL plugin is active and saved
-- Check TRMNL plugin logs/console
+- Verify TRMNL webhook URL is correct in `.env`
+- Check service logs for webhook request/response
+- Verify TRMNL Private Plugin markup is saved and matches payload shape
+- Use `--preview` to save JSON/PNG locally and inspect payload
 
 ### Parsing Errors
 
-- Verify CSV format from Looker
-- Check email attachment is included
-- Review parse-email.js logs in Pipedream
+- Ensure Looker sends PDF (or CSV) attachment
+- Check attachment is included in the email
+- Run with `--preview` and inspect extracted data
 - Test with sample CSV using `scripts/parse-csv.js`
 
 ### Gmail API Errors
 
 - Verify Gmail API is enabled in Google Cloud Console
-- Check OAuth2 credentials are correct
+- Check OAuth2 credentials (or service account) are correct
 - Ensure proper scopes are granted
-- Review Google Cloud Console API usage logs
+- Re-run OAuth2 flow if token expired
 
 ## Next Steps
 
 Once everything is working:
 
-1. **Customize the TRMNL Plugin**: Edit `plugin.html` to match your brand/style
+1. **Customize the TRMNL Plugin**: Edit the template to match your brand/style
 2. **Add More Reports**: Configure additional Looker schedules
 3. **Optimize Display**: Adjust data formatting for your e-ink display size
-4. **Set Up Monitoring**: Add error notifications/alerts in Pipedream
+4. **Set Up Monitoring**: Add logging, alerts, or health checks as needed
 5. **Document Your Setup**: Note any customizations for future reference
 
 ## Support Resources
 
 - [TRMNL Documentation](https://trmnl.co/docs)
-- [Pipedream Documentation](https://pipedream.com/docs)
 - [Gmail API Documentation](https://developers.google.com/gmail/api)
 - [Looker Scheduling Docs](https://docs.cloud.google.com/looker/docs/scheduling)
 
@@ -216,7 +158,7 @@ Once everything is working:
 If you encounter issues:
 
 1. Check the troubleshooting section above
-2. Review Pipedream execution logs
+2. Review service logs (local or GCP)
 3. Test individual components (Gmail API, TRMNL webhook)
 4. Review the detailed guides in each component's README
 

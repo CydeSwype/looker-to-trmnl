@@ -102,11 +102,11 @@ Subject: [Report Name] - [Date]
 
 ## Email Query Configuration
 
-After setting up the schedule, note the sender email address. You'll need this for your Pipedream workflow Gmail query:
+After setting up the schedule, note the sender email address. You'll need this for the local service (or GCP service) Gmail query:
 
-- Looker typically sends from: `looker@yourdomain.com` or `noreply@looker.com`
+- Looker Studio typically sends from: `looker-studio-noreply@google.com`
 - Check the "From" field in a test email
-- Use this in your Pipedream Gmail trigger query: `from:looker@yourdomain.com`
+- Use this in your service's email query, e.g.: `from:looker-studio-noreply@google.com`
 
 ## Multiple Reports
 
@@ -115,8 +115,7 @@ If you want to schedule multiple reports:
 1. Create separate schedules for each report
 2. Use the same target email address
 3. Use distinct subject lines to identify reports
-4. Update your Pipedream workflow to handle multiple report types
-5. Consider adding report type identification in the transformation step
+4. The service processes each email and sends data to the TRMNL webhook; the plugin can use the subject/title to distinguish reports
 
 ## Troubleshooting
 
@@ -141,7 +140,7 @@ If you want to schedule multiple reports:
 After configuring Looker:
 1. Send a test email
 2. Verify it arrives in Gmail
-3. Check that your Pipedream workflow detects it
+3. Check that your local service (or GCP service) processes it
 4. Verify the data appears correctly on your TRMNL display
 
 ## Reference

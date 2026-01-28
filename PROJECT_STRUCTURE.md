@@ -13,15 +13,21 @@ looker-to-trmnl/
 ├── package.json                 # Node.js project configuration
 ├── .gitignore                   # Git ignore rules
 │
-├── trmnl-plugin/                # TRMNL plugin code
+├── local-service/               # Local Node.js service (Gmail → TRMNL)
+│   ├── index.js                 # Entry point, Gmail + webhook logic
+│   ├── lib/                     # Email processing, PDF parsing, webhook
+│   ├── trmnl-plugin-template.html  # TRMNL Private Plugin markup template
+│   └── README.md                # Local service setup
+│
+├── trmnl-plugin/                # TRMNL plugin template (legacy/reference)
 │   ├── README.md                # Plugin setup instructions
 │   └── plugin.html              # TRMNL plugin HTML/CSS/Liquid template
 │
-├── pipedream-workflow/          # Pipedream workflow code
-│   ├── README.md                # Workflow setup instructions
-│   ├── parse-email.js           # Email parsing step code
-│   ├── transform-data.js        # Data transformation step code
-│   └── workflow-config.json     # Workflow configuration reference
+├── pipedream-workflow/          # Legacy (unused); kept for reference
+│   ├── README.md                # Legacy workflow notes
+│   ├── parse-email.js           # (unused)
+│   ├── transform-data.js        # (unused)
+│   └── workflow-config.json     # (unused)
 │
 ├── scripts/                     # Utility scripts and setup guides
 │   ├── gmail-setup.md           # Gmail API setup guide
@@ -48,13 +54,17 @@ The TRMNL plugin receives webhook data and renders it on your e-ink display.
   - Supports metrics, tables, and bar charts
   - Uses Liquid templating for dynamic content
 
-### Pipedream Workflow (`pipedream-workflow/`)
+### Local Service (`local-service/`)
 
-The Pipedream workflow orchestrates the entire pipeline.
+The local service orchestrates the pipeline: it reads Gmail (via Gmail API), parses PDF attachments, formats data for the TRMNL Private Plugin webhook, and POSTs JSON to TRMNL.
 
-- **parse-email.js**: Extracts email content and CSV attachments from Gmail
-- **transform-data.js**: Transforms parsed data into TRMNL-compatible format
-- **workflow-config.json**: Reference configuration for the workflow steps
+- **index.js**: Entry point; Gmail search, rate limiting, webhook POST
+- **lib/email-processor.js**: PDF parsing, table extraction, webhook payload formatting
+- **trmnl-plugin-template.html**: TRMNL Framework markup (Grid layout) for the Private Plugin
+
+### Legacy: Pipedream Workflow (`pipedream-workflow/`)
+
+**Not used.** This folder is kept for reference only. The current design uses the local service (or GCP service) instead.
 
 ### Scripts (`scripts/`)
 
@@ -79,8 +89,8 @@ Additional setup and configuration guides.
 ### Code Files
 
 - **plugin.html**: TRMNL plugin template (copy into TRMNL editor)
-- **parse-email.js**: Pipedream code step (copy into Pipedream workflow)
-- **transform-data.js**: Pipedream code step (copy into Pipedream workflow)
+- **local-service/**: Run `node index.js` (see local-service/README.md)
+- **parse-email.js**, **transform-data.js**: Legacy Pipedream steps (unused)
 - **parse-csv.js**: Utility script for local testing
 
 ### Documentation Files
@@ -92,10 +102,10 @@ Additional setup and configuration guides.
 1. **Read**: Start with `SETUP.md` for the complete setup process
 2. **Configure**: Follow guides in order:
    - `scripts/gmail-setup.md`
-   - `trmnl-plugin/README.md`
-   - `pipedream-workflow/README.md`
+   - `trmnl-plugin/README.md` (or use `local-service/trmnl-plugin-template.html`)
+   - `local-service/README.md`
    - `docs/looker-setup.md`
-3. **Deploy**: Copy code into respective platforms (TRMNL, Pipedream)
+3. **Deploy**: Copy plugin markup into TRMNL; run local service (or deploy GCP service)
 4. **Test**: Verify each component works before moving to the next
 
 ## Customization Points
@@ -107,15 +117,11 @@ You can customize:
    - Color scheme (remember: e-ink is monochrome)
    - Data visualization style
 
-2. **Data Transformation** (`pipedream-workflow/transform-data.js`):
-   - Metric extraction logic
-   - Data formatting
-   - Report type detection
+2. **Data Transformation** (`local-service/lib/email-processor.js` – `formatForTRMNLWebhook`):
+   - Metric extraction logic, data formatting, report type detection
 
-3. **Email Parsing** (`pipedream-workflow/parse-email.js`):
-   - Attachment handling
-   - Email body parsing
-   - Error handling
+3. **Email Parsing** (`local-service/lib/email-processor.js` – `parseEmail`, `parsePDF`, `parsePDFTable`):
+   - Attachment handling, PDF table extraction, error handling
 
 ## Testing
 

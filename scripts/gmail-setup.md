@@ -33,7 +33,7 @@ This guide walks you through setting up Gmail API access for the Looker to TRMNL
 6. Click on the created service account
 7. Go to "Keys" tab → "Add Key" → "Create new key"
 8. Choose "JSON" format
-9. Save the downloaded JSON file securely (you'll need it for Pipedream)
+9. Save the downloaded JSON file securely (you'll need it for the local service or GCP service)
 
 ### Option B: OAuth2 Client ID (For user-based access)
 
@@ -41,10 +41,9 @@ This guide walks you through setting up Gmail API access for the Looker to TRMNL
 2. Click "Create Credentials" → "OAuth client ID"
 3. Choose "Web application"
 4. Name it "Looker TRMNL Pipeline"
-5. Add authorized redirect URIs:
-   - `https://api.pipedream.com/v1/oauth/callback/gmail`
+5. Add authorized redirect URIs (for local OAuth2 flow, use e.g. `http://localhost` or the redirect URL shown by the local service when you run it)
 6. Click "Create"
-7. Save the Client ID and Client Secret (you'll need them for Pipedream)
+7. Save the Client ID and Client Secret (you'll add them to `local-service/.env`)
 
 ## Step 4: Configure Gmail Push Notifications (Optional but Recommended)
 
@@ -52,14 +51,7 @@ For real-time email detection instead of polling:
 
 1. Go to "APIs & Services" → "Credentials"
 2. Note your Project Number (found in project settings)
-3. You'll need to set up a Pub/Sub topic (Pipedream can handle this automatically)
-
-### Using Pipedream's Built-in Gmail Integration
-
-Pipedream can handle Gmail Push Notifications automatically when you:
-1. Connect your Gmail account in Pipedream
-2. Select "Gmail - New Email" trigger
-3. Pipedream will set up the necessary Pub/Sub infrastructure
+3. For the local service, polling (periodic Gmail API list/search) is used; no Pub/Sub required.
 
 ## Step 5: Create Dedicated Email Address
 
@@ -76,16 +68,13 @@ Pipedream can handle Gmail Push Notifications automatically when you:
    - Apply label: "Looker Reports"
 3. This helps organize and makes querying easier
 
-## Step 7: Configure Pipedream
+## Step 7: Configure the Local Service (or GCP Service)
 
-1. In your Pipedream workflow, add the Gmail trigger
-2. When prompted, connect your Gmail account:
-   - For OAuth2: Use the Client ID and Client Secret from Step 3
-   - For Service Account: Upload the JSON key file from Step 3
-3. Configure the trigger:
-   - **Label**: "Looker Reports" (or "INBOX")
-   - **Query**: `from:looker@yourdomain.com` (adjust to your sender)
-   - **Polling Interval**: 5 minutes (or use Push Notifications)
+1. In `local-service/.env`, set:
+   - `GMAIL_CLIENT_ID` and `GMAIL_CLIENT_SECRET` (OAuth2), or path to service account JSON
+   - `TRMNL_WEBHOOK_URL` (your TRMNL Private Plugin webhook URL)
+2. Run the local service; on first run with OAuth2, it will open a browser to authorize and save a token.
+3. The service uses Gmail API to search for emails (e.g. `from:looker-studio-noreply@google.com`) and process them.
 
 ## Required Gmail API Scopes
 
@@ -93,13 +82,13 @@ The following scopes are needed:
 - `https://www.googleapis.com/auth/gmail.readonly` - Read emails
 - `https://www.googleapis.com/auth/gmail.modify` - Mark emails as read (optional)
 
-Pipedream will request these automatically when you connect your Gmail account.
+The local service requests these when you complete the OAuth2 flow.
 
 ## Security Best Practices
 
-1. **Use Service Account**: For automated workflows, service accounts are more secure than user OAuth
+1. **OAuth2 for user inbox**: Use OAuth2 if reading a user's Gmail; store token in `gmail-token.json` (add to `.gitignore`).
 2. **Minimal Permissions**: Only grant the minimum required Gmail API scopes
-3. **Secure Storage**: Store credentials securely (Pipedream encrypts them)
+3. **Secure Storage**: Keep credentials in `.env` (never commit); never commit `gmail-token.json`
 4. **Monitor Access**: Regularly review API usage in Google Cloud Console
 5. **Rotate Credentials**: Periodically rotate service account keys
 
@@ -122,6 +111,6 @@ Pipedream will request these automatically when you connect your Gmail account.
 ## Next Steps
 
 After completing this setup:
-1. Proceed to [Pipedream Workflow Setup](../pipedream-workflow/README.md)
-2. Configure your Looker scheduled email delivery
+1. Proceed to [Local Service Setup](../local-service/README.md) or [SETUP_LOCAL.md](../SETUP_LOCAL.md)
+2. Configure your Looker scheduled email delivery (`docs/looker-setup.md`)
 3. Test the complete pipeline

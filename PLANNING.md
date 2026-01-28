@@ -132,7 +132,7 @@ This document outlines the architecture and implementation plan for a data pipel
 - [ ] Set up Gmail API access (OAuth2 credentials in Google Cloud Console)
 - [ ] Create dedicated G Suite email address for Looker reports (e.g., `looker-reports@yourdomain.com`)
 - [ ] Configure Gmail Push Notifications or polling mechanism
-- [ ] Set up workflow automation account (Pipedream recommended - has Gmail API integration)
+- [ ] Set up workflow automation (local service or GCP service)
 
 ### Phase 2: TRMNL Plugin Development
 - [ ] Create TRMNL plugin with webhook endpoint
@@ -141,7 +141,7 @@ This document outlines the architecture and implementation plan for a data pipel
 - [ ] Test plugin rendering with sample data
 
 ### Phase 3: Workflow Automation
-- [ ] Create Pipedream workflow (or equivalent)
+- [ ] Run local service or deploy GCP service
 - [ ] Configure Gmail API trigger (Push Notifications or polling)
 - [ ] Set up OAuth2 authentication for Gmail API
 - [ ] Implement email parsing logic (using Gmail API to fetch email content)
@@ -217,7 +217,7 @@ This document outlines the architecture and implementation plan for a data pipel
 
 A working example exists using Postmark (useful for understanding the workflow pattern):
 - **Repository**: https://github.com/schrockwell/trmnl-postmark-challenge
-- **Components**: TRMNL plugin + Pipedream workflow
+- **Components**: TRMNL Private Plugin + local service (or GCP service)
 - **Use Case**: Email-to-e-ink feed for TRMNL
 - **Note**: This can be adapted to use Gmail API instead of Postmark
 
@@ -245,7 +245,7 @@ A working example exists using Postmark (useful for understanding the workflow p
 ## Next Steps
 
 1. Review and approve this planning document
-2. Set up accounts for required services (TRMNL, Pipedream)
+2. Set up accounts for required services (TRMNL, Google Cloud for Gmail API)
 3. Configure Gmail API access in Google Cloud Console
 4. Begin Phase 1 implementation
 5. Create detailed technical specifications for each component

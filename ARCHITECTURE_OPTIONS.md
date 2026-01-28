@@ -1,73 +1,63 @@
-# Architecture Options: Pipedream vs GCP Service
+# Architecture Options: Local Service vs GCP Service
 
 ## Comparison
 
-### Option A: Pipedream (Original Plan)
+### Option A: Local Service (Recommended)
 **Pros:**
-- ✅ No infrastructure management
-- ✅ Built-in Gmail integration
-- ✅ Visual workflow editor
-- ✅ Easy to set up initially
+- ✅ No cloud cost; runs on your machine (e.g. Mac mini)
+- ✅ Full control over code and execution
+- ✅ Simple setup: clone repo, install deps, configure `.env`, run
+- ✅ No vendor lock-in
+- ✅ Easy to debug and iterate (e.g. `--preview`)
 
 **Cons:**
-- ❌ Pricing can be limiting (free tier: 100 invocations/day, 2 workflows)
-- ❌ Less control over execution
-- ❌ Vendor lock-in
-- ❌ Limited customization
+- ⚠️ Machine must be on and connected when you want to process emails
+- ⚠️ You manage scheduling (cron, launchd)
 
-**Cost:** Free tier limited, then $19/month+ for production use
+**Cost:** Free
 
-### Option B: GCP Service (Recommended for Your Use Case)
+### Option B: GCP Service
 **Pros:**
 - ✅ Full control over code and execution
 - ✅ Cost-effective (Cloud Run: ~$0.40/month for daily polling)
-- ✅ Uses existing GCP infrastructure
-- ✅ No vendor lock-in
-- ✅ Can customize exactly to your needs
-- ✅ Better for long-term maintenance
+- ✅ No local machine required; runs in the cloud
+- ✅ Can use Cloud Scheduler for cron-style triggers
 
 **Cons:**
-- ⚠️ Requires some infrastructure setup
-- ⚠️ Need to manage deployment
+- ⚠️ Requires GCP project and deployment
 - ⚠️ Slightly more initial setup
 
 **Cost:** Cloud Run: ~$0.40/month (for daily polling), or free tier eligible
 
-## Recommendation: GCP Service
+## Recommendation: Local Service
 
-Given your requirements:
-- Daily frequency (low volume)
-- Simple table/chart data
-- Existing GCP resources
-- Cost concerns
+For most users, running the local service on a machine that’s already on (e.g. Mac mini) is the simplest and cheapest option. Use GCP if you prefer a serverless, always-available setup.
 
-**A GCP Cloud Run service is the better choice.**
-
-## Architecture: GCP Service
+## Architecture: Local Service
 
 ```
 ┌─────────────┐
-│   Looker    │
-│  Scheduled  │
-│    Email    │
-└──────┬──────┘
+│   Looker   │
+│  Scheduled │
+│    Email   │
+└──────┬─────┘
        │
-       │ (Email with CSV attachment)
+       │ (Email with PDF attachment)
        ▼
 ┌─────────────┐
-│  Gmail      │
-│  (G Suite)  │
-└──────┬──────┘
+│   Gmail     │
+│  (inbox)    │
+└──────┬─────┘
        │
-       │ (Gmail API Polling or Pub/Sub)
+       │ (Gmail API)
        ▼
 ┌─────────────┐
-│ Cloud Run   │
-│  Service    │
+│ Local       │
+│ Service     │
 │ (Node.js)   │
-└──────┬──────┘
+└──────┬─────┘
        │
-       │ (Transformed JSON)
+       │ (JSON to TRMNL Private Plugin webhook)
        ▼
 ┌─────────────┐
 │   TRMNL     │
@@ -77,30 +67,29 @@ Given your requirements:
 
 ## Implementation Options
 
-### Option 1: Cloud Run (Recommended)
+### Option 1: Local Service (Recommended)
+- **Deployment**: Run `node index.js` (or schedule with cron/launchd)
+- **Trigger**: Cron/launchd or manual run
+- **Cost**: Free
+- **Best for**: Single machine always on (e.g. Mac mini)
+
+### Option 2: GCP Cloud Run
 - **Deployment**: Containerized Node.js service
-- **Trigger**: Cloud Scheduler (cron job) → HTTP endpoint
+- **Trigger**: Cloud Scheduler (cron) → HTTP endpoint
 - **Cost**: ~$0.40/month for daily execution
 - **Scaling**: Automatic, scales to zero when not in use
 
-### Option 2: Cloud Functions
+### Option 3: GCP Cloud Functions
 - **Deployment**: Serverless function
 - **Trigger**: Cloud Scheduler → HTTP trigger
-- **Cost**: Free tier eligible, then ~$0.40/month
+- **Cost**: Free tier eligible
 - **Limitations**: 9 minute timeout, less flexibility
 
-### Option 3: App Engine
-- **Deployment**: Managed platform
-- **Trigger**: Cron job or HTTP endpoint
-- **Cost**: Free tier eligible
-- **More**: Full platform, more setup
-
-**Recommendation: Cloud Run** - Best balance of flexibility, cost, and simplicity.
+**Recommendation:** Start with the local service; move to GCP if you need serverless or don’t want to keep a machine running.
 
 ## Next Steps
 
-1. Review the GCP service code I'll create
-2. Choose deployment option (Cloud Run recommended)
-3. Set up GCP project and credentials
-4. Deploy the service
-5. Configure Cloud Scheduler for daily execution
+1. Review the local service code in `local-service/`
+2. Follow `SETUP_LOCAL.md` (or `SETUP_GCP_SERVICE.md` for GCP)
+3. Configure Gmail API and TRMNL webhook URL
+4. Run the service (or deploy and schedule on GCP)

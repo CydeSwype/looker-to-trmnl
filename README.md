@@ -6,9 +6,10 @@ Automated pipeline to deliver Looker reports to TRMNL e-ink displays via schedul
 
 ```
 .
-├── trmnl-plugin/          # TRMNL plugin code
-├── pipedream-workflow/    # Pipedream workflow code
+├── local-service/         # Local Node.js service (Gmail → TRMNL)
+├── trmnl-plugin/          # TRMNL Private Plugin template
 ├── scripts/               # Setup and utility scripts
+├── pipedream-workflow/    # Legacy (unused); kept for reference
 ├── config/                # Configuration templates
 └── docs/                  # Additional documentation
 ```
@@ -18,9 +19,8 @@ Automated pipeline to deliver Looker reports to TRMNL e-ink displays via schedul
 ### Prerequisites
 
 1. **TRMNL Account**: Sign up at [trmnl.co](https://trmnl.co)
-2. **G Suite Account**: Access to Google Workspace with admin permissions
-3. **Pipedream Account**: Sign up at [pipedream.com](https://pipedream.com) (free tier available)
-4. **Looker Access**: Admin access to configure scheduled email deliveries
+2. **Gmail / Google Account**: For OAuth2 or service account (Gmail API)
+3. **Looker Access**: Admin access to configure scheduled email deliveries
 
 ### Setup Steps
 

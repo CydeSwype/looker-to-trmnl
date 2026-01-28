@@ -1,11 +1,12 @@
 # Repository Guidelines
 
-This guide is for contributors working on the Looker → Gmail → Pipedream → TRMNL pipeline.
+This guide is for contributors working on the Looker → Gmail → Local Service → TRMNL pipeline.
 
 ## Project Structure & Module Organization
 
-- `trmnl-plugin/`: TRMNL plugin template (`plugin.html`) with HTML/CSS/Liquid.
-- `pipedream-workflow/`: Pipedream step code (`parse-email.js`, `transform-data.js`) and `workflow-config.json`.
+- `local-service/`: Node.js service that reads Gmail, parses PDFs, and POSTs to TRMNL webhook.
+- `trmnl-plugin/`: TRMNL Private Plugin template (HTML/CSS/Liquid).
+- `pipedream-workflow/`: Legacy (unused); kept for reference only.
 - `scripts/`: Utilities and setup helpers (notably `parse-csv.js` for local parsing tests).
 - `docs/`: Looker configuration docs; see `docs/looker-setup.md`.
 - Root docs: `README.md`, `SETUP.md`, `PLANNING.md`, `PROJECT_STRUCTURE.md`.
@@ -14,12 +15,13 @@ This guide is for contributors working on the Looker → Gmail → Pipedream →
 
 - `node scripts/parse-csv.js <csv-file> "Report Title"`: Local parse/transformation smoke test.
 - `npm run test-parse`: Alias for `node scripts/parse-csv.js` (expects CLI args).
+- From `local-service/`: `node index.js` (or `node index.js --preview` for local preview).
 
-There is no build step; deployment is copy/paste into TRMNL and Pipedream per the guides.
+There is no build step; deployment is copy/paste into TRMNL and run the local service per the guides.
 
 ## Coding Style & Naming Conventions
 
-- JavaScript is plain Node/CommonJS in `scripts/`, and Pipedream-style `export default` in `pipedream-workflow/`.
+- JavaScript is plain Node/CommonJS in `scripts/` and `local-service/`.
 - Keep the existing 2-space indentation and inline comments style in JS files.
 - HTML/CSS lives in `trmnl-plugin/plugin.html` and uses Liquid placeholders like `{{ report_title }}`.
 
@@ -37,5 +39,5 @@ There is no build step; deployment is copy/paste into TRMNL and Pipedream per th
 
 ## Security & Configuration Notes
 
-- Gmail and Pipedream credentials should never be committed; keep them in platform configs.
+- Gmail and TRMNL credentials should never be committed; keep them in `.env` or platform configs.
 - E-ink displays are monochrome: avoid color-only meaning in `trmnl-plugin/plugin.html`.

@@ -1,6 +1,6 @@
 # TRMNL Plugin
 
-This plugin receives webhook data from Pipedream and renders Looker report data on your TRMNL e-ink display.
+This plugin receives webhook data from the local service (or GCP service) and renders Looker report data on your TRMNL e-ink display.
 
 ## Features
 
@@ -15,7 +15,7 @@ This plugin receives webhook data from Pipedream and renders Looker report data 
 2. Create a new private plugin
 3. Copy the contents of `plugin.html` into the plugin editor
 4. Save and note your plugin's webhook URL
-5. Use this webhook URL in your Pipedream workflow configuration
+5. Use this webhook URL in your local service (or GCP service) configuration (e.g. `TRMNL_WEBHOOK_URL` in `.env`)
 
 ## Webhook Format
 

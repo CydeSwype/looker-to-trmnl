@@ -110,7 +110,7 @@ For daily execution:
 - **Gmail API**: Free (within quota limits)
 - **Cloud Scheduler**: Free (first 3 jobs)
 
-**Total: ~$0.40/month** (vs Pipedream's $19/month+)
+**Total: ~$0.40/month**
 
 ## Monitoring
 

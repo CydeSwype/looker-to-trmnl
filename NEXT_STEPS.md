@@ -7,13 +7,13 @@ Based on your requirements, here's what we've prepared and what to do next.
 ✅ **Code Complete**:
 - TRMNL plugin HTML template (`trmnl-plugin/plugin.html`)
 - GCP service code (`gcp-service/`) - Full Node.js service ready to deploy
-- Pipedream workflow code (alternative option)
+- Local service code (`local-service/`)
 - Utility scripts for testing
 - All documentation
 
 ✅ **Architecture Decision**:
 - **Recommended**: GCP Cloud Run service (~$0.40/month)
-- **Alternative**: Pipedream (if you prefer managed service, but more expensive)
+- **Alternative**: GCP Cloud Run (if you prefer serverless)
 
 ## Your Answers Summary
 
@@ -128,7 +128,7 @@ gcloud scheduler jobs create http looker-to-trmnl-daily \
 
 ## Documentation Reference
 
-- **Architecture Options**: `ARCHITECTURE_OPTIONS.md` - Compare Pipedream vs GCP
+- **Architecture Options**: `ARCHITECTURE_OPTIONS.md` - Compare local vs GCP
 - **GCP Setup Guide**: `SETUP_GCP_SERVICE.md` - Complete step-by-step
 - **Gmail API Setup**: `scripts/gmail-setup.md` - Detailed Gmail API guide
 - **TRMNL Plugin**: `trmnl-plugin/README.md` - Plugin setup
